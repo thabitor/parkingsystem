@@ -27,7 +27,7 @@ public class FareCalculatorService {
         //TODO: Some tests are failing here. Need to check if this logic is correct
 
         double duration;
-        if ((dateOut - dateIn == 1) || ( dateIn - dateOut > 1 && monthOut - monthIn == 1)) {
+        if ((dateOut - dateIn == 1) || ( dateIn - dateOut > 1 && (monthOut - monthIn == 1 || monthOut - monthIn == -11))) {
             duration = 24.0;
         } else if ((outHour - inHour) <= 1.0) {
             duration = abs(((inMinute-outMinute)-60)/60);
