@@ -16,11 +16,10 @@ public class DataBaseTestConfig extends DataBaseConfig {
         logger.info("Create DB connection");
         Class.forName("com.mysql.cj.jdbc.Driver");
 
-        PropertiesReader connectionCredentials = new PropertiesReader("dbConnectionConfig.properties");
         return DriverManager.getConnection(
-                connectionCredentials.getProperty("url"),
-                connectionCredentials.getProperty("user"),
-                connectionCredentials.getProperty("password"));
+                "jdbc:mysql://localhost:3306/prod",
+                "thabit",
+                "rootroot");
     }
 
     public void closeConnection(Connection con){
