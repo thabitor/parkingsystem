@@ -19,25 +19,6 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
-//    public void historyCheck (Ticket ticket) {
-//        Connection con = null;
-//        try {
-//            con = dataBaseConfig.getConnection();
-//            PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_HISTORY);
-//            ResultSet rs = ps.executeQuery();
-//            if(rs.next()) {
-//                System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount.");
-//                ticket.setPrice((rs.getDouble(3) - (rs.getDouble(3) * 0.05)));
-//            } else {
-//                ticket.setPrice(rs.getDouble(3));
-//            } } catch (Exception e) {
-//            logger.error("Error checking ticket history", e);
-//        } finally {
-//            dataBaseConfig.closeConnection(con);
-//            return;
-//        }
-//    }
-
     public boolean saveTicket(Ticket ticket){
         Connection con = null;
         try {
