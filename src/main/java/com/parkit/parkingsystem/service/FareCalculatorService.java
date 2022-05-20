@@ -1,15 +1,17 @@
 package com.parkit.parkingsystem.service;
 
 import com.parkit.parkingsystem.constants.Fare;
+import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.Ticket;
 
 import static java.lang.Math.abs;
 
 public class FareCalculatorService {
 
+    private static TicketDAO ticketDAO;
 
 
-    public double calculateFare(Ticket ticket) {
+    public void calculateFare(Ticket ticket) throws Exception {
         if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {
             throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
         }
@@ -22,7 +24,7 @@ public class FareCalculatorService {
         int dateOut = ticket.getOutTime().getDate();
         int monthIn = ticket.getInTime().getMonth();
         int monthOut = ticket.getOutTime().getMonth();
-        double fare;
+   //     double fare;
 
 
         //TODO: Some tests are failing here. Need to check if this logic is correct
@@ -31,23 +33,24 @@ public class FareCalculatorService {
 
         if ((dateOut - dateIn == 1) || (dateIn - dateOut > 1 && (monthOut - monthIn == 1 || monthOut - monthIn == -11))) {
             duration = 24.0;
-        } else if ((abs(outHour - inHour) <= 1.0 || abs(outHour - inHour) == 23.0) && abs(abs(outMinute - inMinute) - 60) > 30.0) {
+        } else if (((outHour - inHour) <= 1.0 || abs(outHour - inHour) == 23.0) && abs(abs(outMinute - inMinute) - 60) > 30.0) {
             duration = abs((abs(inMinute - outMinute) - 60.0) / 60.0);
         } else if ((outMinute - inMinute) <= 30.0) {
             duration = 0.0;
         } else duration = outHour - inHour;
 
 
-        switch (ticket.getParkingSpot().getParkingType()){
+        switch (ticket.getParkingSpot().getParkingType()) {
             case CAR: {
-                fare = ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
+                ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
                 break;
             }
             case BIKE: {
-                fare = ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
+                ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
                 break;
             }
-            default: throw new IllegalArgumentException("Unknown Parking Type");
-        } return fare;
+            default:
+                throw new IllegalArgumentException("Unknown Parking Type");
+        }
     }
 }
