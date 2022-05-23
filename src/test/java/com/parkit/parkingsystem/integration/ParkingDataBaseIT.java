@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 public class ParkingDataBaseIT {
 
     public static final String TEST_VEHICLE_REG_NUMBER = "ABCDEF";
+    public static final String TEST_VEHICLE_REG_NUMBER2 = "MYTEST";
     private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
@@ -67,8 +68,6 @@ public class ParkingDataBaseIT {
             ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
             parkingService.processIncomingVehicle();
             Ticket ticket = ticketDAO.getTicket(TEST_VEHICLE_REG_NUMBER);
-            System.out.println(ticket.getParkingSpot());
-            System.out.println(ticket.getInTime());
             assertFalse(ticket.getParkingSpot().isAvailable());
 
         } catch (NullPointerException e) {
@@ -83,18 +82,42 @@ public class ParkingDataBaseIT {
 
     @Test
     public void testParkingLotExit() throws Exception {
+        //TODO: check that the fare generated and out time are populated correctly in the database
+        Connection con = null;
+        try {
+            con = dataBaseTestConfig.getConnection();
+            ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processIncomingVehicle();
+            Ticket ticket = ticketDAO.getTicket(TEST_VEHICLE_REG_NUMBER);
+            parkingService.processExitingVehicle();
+            FareCalculatorService fare = new FareCalculatorService();
+            Date time = new Date();
+            assertTrue(ticket.getOutTime().getHours() == time.getHours() || ticket.getOutTime().getMinutes() == time.getMinutes());
+            assertFalse(ticket.getParkingSpot().isAvailable());
 
-        //long now = time.getTime();
-        testParkingACar();
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        parkingService.processExitingVehicle();
-        Ticket ticket = ticketDAO.getTicket(TEST_VEHICLE_REG_NUMBER);
-        FareCalculatorService fare = new FareCalculatorService();
-        Date time = new Date();
-        assertTrue(ticket.getOutTime().getHours() == time.getHours() || ticket.getOutTime().getMinutes() == time.getMinutes());
-        assertTrue((ticket.getPrice() == fare.calculateFare(ticket)));
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } finally {
+            dataBaseTestConfig.closeConnection(con);
+        }
+    }
 
-    //TODO: check that the fare generated and out time are populated correctly in the database
+    @Test
+    public void testRecurrentCustomer() throws Exception {
+        Connection con = null;
+       try {
+           con = dataBaseTestConfig.getConnection();
+           ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+           parkingService.processIncomingVehicle();
+    //       Ticket ticket = ticketDAO.getTicket(TEST_VEHICLE_REG_NUMBER2);
+           parkingService.processExitingVehicle();
+           assertTrue(ParkingService.checkVehicleHistory(TEST_VEHICLE_REG_NUMBER));
+    } catch (NullPointerException e) {
+        e.printStackTrace();
+    } finally {
+        dataBaseTestConfig.closeConnection(con);
+    }
+
     }
 
 }

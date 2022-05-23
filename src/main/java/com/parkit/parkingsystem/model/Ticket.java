@@ -3,6 +3,7 @@ package com.parkit.parkingsystem.model;
 import java.util.Date;
 
 public class Ticket {
+    public Boolean setBoolean;
     private int id;
     private ParkingSpot parkingSpot;
     private String vehicleRegNumber;
@@ -55,5 +56,8 @@ public class Ticket {
 
     public Date getOutTime() {
         return outTime;
+    }
+
+    public void setBoolean(Boolean recurrent) {
     }
 }

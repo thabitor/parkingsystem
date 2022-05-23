@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.service;
 
+import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -9,6 +10,9 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Date;
 
 public class ParkingService {
@@ -16,10 +20,12 @@ public class ParkingService {
     private static final Logger logger = LogManager.getLogger("ParkingService");
 
     private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
+    private static TicketDAO ticketDAO;
 
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
-    private TicketDAO ticketDAO;
+
+    public static boolean recurrent;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
@@ -34,7 +40,6 @@ public class ParkingService {
                 String vehicleRegNumber = getVehichleRegNumber();
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark its availability as false
-
                 Date inTime = new Date();
                 Ticket ticket = new Ticket();
                 //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
@@ -44,6 +49,10 @@ public class ParkingService {
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
+                checkVehicleHistory(vehicleRegNumber);
+               if (recurrent) {
+                   System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount.");
+               }
                 ticketDAO.saveTicket(ticket);
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
@@ -57,6 +66,29 @@ public class ParkingService {
     private String getVehichleRegNumber() throws Exception {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
+    }
+
+    public static boolean checkVehicleHistory(String vehicleRegNumber) throws Exception {
+        Connection con = null;
+        // vehicleRegNumber = "";
+        ticketDAO.getTicket(vehicleRegNumber);
+        try {
+            con = ticketDAO.dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_HISTORY);
+            ps.setString(1, vehicleRegNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                recurrent = true;
+//                PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
+//                ps2.setBoolean(1, true);
+//                ps2.setInt(2,getTicket(vehicleRegNumber).getId());
+//                ps2.execute();
+            }
+        } catch (Exception ex) {
+            logger.error("Error checking vehicle history", ex);
+        } finally {
+            ticketDAO.dataBaseConfig.closeConnection(con);
+        } return recurrent;
     }
 
     public ParkingSpot getNextParkingNumberIfAvailable(){
@@ -96,6 +128,29 @@ public class ParkingService {
             }
         }
     }
+
+//        public boolean checkVehicleHistory(String vehicleRegNumber) throws Exception {
+//        Connection con = null;
+//        // vehicleRegNumber = "";
+//        ticketDAO.getTicket(vehicleRegNumber);
+//        try {
+//            con = ticketDAO.dataBaseConfig.getConnection();
+//            PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_HISTORY);
+//            ps.setString(1, vehicleRegNumber);
+//            ResultSet rs = ps.executeQuery();
+//            if (rs.next()) {
+//                recurrent = true;
+//                PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
+//                ps2.setBoolean(1, true);
+//                ps2.setInt(2,ticketDAO.getTicket(vehicleRegNumber).getId());
+//                ps2.execute();
+//            }
+//        } catch (Exception ex) {
+//            logger.error("Error checking vehicle history", ex);
+//        } finally {
+//            ticketDAO.dataBaseConfig.closeConnection(con);
+//        } return recurrent;
+//    }
 
     public void processExitingVehicle() {
         try{
