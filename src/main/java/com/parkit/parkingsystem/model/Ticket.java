@@ -1,9 +1,13 @@
 package com.parkit.parkingsystem.model;
 
+import com.parkit.parkingsystem.dao.TicketDAO;
+import com.parkit.parkingsystem.service.ParkingService;
+import com.parkit.parkingsystem.util.InputReaderUtil;
+
 import java.util.Date;
 
 public class Ticket {
-    public Boolean setBoolean;
+
     private int id;
     private ParkingSpot parkingSpot;
     private String vehicleRegNumber;
@@ -39,18 +43,19 @@ public class Ticket {
         return price;
     }
 
-    public double setPrice(double price) {
+    public void setPrice(double price) {
         this.price = price;
-        return price;
     }
 
-    public void setInTime (Date inTime) {
+    public void setInTime(Date inTime) {
         this.inTime = inTime;
     }
+
     public Date getInTime() {
         return inTime;
     }
-    public void setOutTime (Date outTime) {
+
+    public void setOutTime(Date outTime) {
         this.outTime = outTime;
     }
 
@@ -58,6 +63,4 @@ public class Ticket {
         return outTime;
     }
 
-    public void setBoolean(Boolean recurrent) {
-    }
 }

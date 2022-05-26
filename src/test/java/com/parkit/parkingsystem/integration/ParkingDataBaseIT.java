@@ -1,6 +1,5 @@
 package com.parkit.parkingsystem.integration;
 
-import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
@@ -107,11 +106,13 @@ public class ParkingDataBaseIT {
         Connection con = null;
        try {
            con = dataBaseTestConfig.getConnection();
+           when(inputReaderUtil.readSelection()).thenReturn(Integer.valueOf("1"));
+           when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
            ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
            parkingService.processIncomingVehicle();
-    //       Ticket ticket = ticketDAO.getTicket(TEST_VEHICLE_REG_NUMBER2);
            parkingService.processExitingVehicle();
-           assertTrue(ParkingService.checkVehicleHistory(TEST_VEHICLE_REG_NUMBER));
+           parkingService.processIncomingVehicle();
+           assertTrue(parkingService.recurrent);
     } catch (NullPointerException e) {
         e.printStackTrace();
     } finally {

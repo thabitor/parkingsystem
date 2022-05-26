@@ -16,10 +16,10 @@ import java.sql.Timestamp;
 
 public class TicketDAO {
 
-    public boolean recurrent;
     private static final Logger logger = LogManager.getLogger("TicketDAO");
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
+
 
     public boolean saveTicket(Ticket ticket) {
         Connection con = null;
@@ -62,7 +62,6 @@ public class TicketDAO {
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
                 ticket.setPrice(rs.getDouble(3));
-                ticket.setBoolean(rs.getBoolean(2));
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -74,8 +73,9 @@ public class TicketDAO {
         return ticket;
     }
 
-//    public boolean checkVehicleHistory(String vehicleRegNumber) throws Exception {
+//    public boolean checkVehicleHistory(String vehicleRegNumber) {
 //        Connection con = null;
+//        recurrent = false;
 //        // vehicleRegNumber = "";
 //        getTicket(vehicleRegNumber);
 //        try {
@@ -105,8 +105,7 @@ public class TicketDAO {
             PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
             ps.setDouble(1, ticket.getPrice());
             ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
-            ps.setBoolean(3, ParkingService.checkVehicleHistory(ticket.getVehicleRegNumber()));
-            ps.setInt(4,ticket.getId());
+            ps.setInt(3,ticket.getId());
             ps.execute();
             return true;
         }catch (Exception ex){

@@ -19,19 +19,19 @@ public class ParkingService {
 
     private static final Logger logger = LogManager.getLogger("ParkingService");
 
-    private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
-    private static TicketDAO ticketDAO;
-
+    private FareCalculatorService fareCalculatorService = new FareCalculatorService();
+    private TicketDAO ticketDAO;
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
 
-    public static boolean recurrent;
+    public boolean recurrent;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
     }
+
 
     public void processIncomingVehicle() {
         try{
@@ -50,7 +50,8 @@ public class ParkingService {
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
                 checkVehicleHistory(vehicleRegNumber);
-               if (recurrent) {
+               if (checkVehicleHistory(vehicleRegNumber)) {
+                   this.recurrent = true;
                    System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount.");
                }
                 ticketDAO.saveTicket(ticket);
@@ -68,8 +69,9 @@ public class ParkingService {
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
 
-    public static boolean checkVehicleHistory(String vehicleRegNumber) throws Exception {
+    public boolean checkVehicleHistory(String vehicleRegNumber) {
         Connection con = null;
+        recurrent = false;
         // vehicleRegNumber = "";
         ticketDAO.getTicket(vehicleRegNumber);
         try {
@@ -78,11 +80,11 @@ public class ParkingService {
             ps.setString(1, vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                recurrent = true;
-//                PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
-//                ps2.setBoolean(1, true);
-//                ps2.setInt(2,getTicket(vehicleRegNumber).getId());
-//                ps2.execute();
+                this.recurrent = true;
+                PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
+                ps2.setBoolean(1, true);
+                ps2.setInt(2,ticketDAO.getTicket(vehicleRegNumber).getId());
+                ps2.execute();
             }
         } catch (Exception ex) {
             logger.error("Error checking vehicle history", ex);
@@ -92,7 +94,7 @@ public class ParkingService {
     }
 
     public ParkingSpot getNextParkingNumberIfAvailable(){
-        int parkingNumber=0;
+        int parkingNumber;
         ParkingSpot parkingSpot = null;
         try{
             ParkingType parkingType = getVehichleType();
@@ -129,29 +131,6 @@ public class ParkingService {
         }
     }
 
-//        public boolean checkVehicleHistory(String vehicleRegNumber) throws Exception {
-//        Connection con = null;
-//        // vehicleRegNumber = "";
-//        ticketDAO.getTicket(vehicleRegNumber);
-//        try {
-//            con = ticketDAO.dataBaseConfig.getConnection();
-//            PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_HISTORY);
-//            ps.setString(1, vehicleRegNumber);
-//            ResultSet rs = ps.executeQuery();
-//            if (rs.next()) {
-//                recurrent = true;
-//                PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
-//                ps2.setBoolean(1, true);
-//                ps2.setInt(2,ticketDAO.getTicket(vehicleRegNumber).getId());
-//                ps2.execute();
-//            }
-//        } catch (Exception ex) {
-//            logger.error("Error checking vehicle history", ex);
-//        } finally {
-//            ticketDAO.dataBaseConfig.closeConnection(con);
-//        } return recurrent;
-//    }
-
     public void processExitingVehicle() {
         try{
             String vehicleRegNumber = getVehichleRegNumber();
@@ -159,10 +138,14 @@ public class ParkingService {
             Date outTime = new Date();
             ticket.setOutTime(outTime);
             fareCalculatorService.calculateFare(ticket);
+            if (recurrent || checkVehicleHistory(vehicleRegNumber)) {
+                ticket.setPrice(ticket.getPrice() - (ticket.getPrice() * 0.05));
+            }
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
+
                 System.out.println("Please pay the parking fare:" + ticket.getPrice());
                 System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             }else{
