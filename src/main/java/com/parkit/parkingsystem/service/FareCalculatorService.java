@@ -38,13 +38,15 @@ public class FareCalculatorService {
             duration = 24.0;
         } else if (((abs(hrDiff) <= 1.0 || abs(hrDiff) == 23.0) && outMinute == inMinute)) {
             duration = 1;
-        } else if ((abs(hrDiff) <= 1.0 || abs(hrDiff) == 23.0)
-                && (minDiff > 30.0 && minDiff <= 45.0)
-                || (abs(minDiff - 60) >= 45.0 )) {
+        } else if (inHour == outHour && minDiff >= 45.0) {
             duration = 0.75;
         } else if ((abs(hrDiff) <= 1.0 || abs(hrDiff) == 23.0)
-                && (minDiff <= 30.0)
-                || abs(minDiff - 60) <= 30.0) {
+                && (minDiff <= 15.0 || minDiff >= 45.0)){
+            duration = 0.75;
+        } else if ((inHour == outHour && minDiff <= 30.0)) {
+            duration = 0.0;
+        } else if ((abs(hrDiff) <= 1.0 || abs(hrDiff) == 23.0)
+                && (minDiff <= 30.0) || abs(minDiff - 60) <= 30.0) {
             duration = 0.0;
         } else {
             duration = hrDiff;

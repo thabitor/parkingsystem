@@ -212,8 +212,6 @@ public class FareCalculatorServiceTest {
             e.printStackTrace();
         } finally {
             dataBaseTestConfig.closeConnection(con);
-
-
         }
     }
 }
