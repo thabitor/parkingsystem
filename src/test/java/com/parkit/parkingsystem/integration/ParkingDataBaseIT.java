@@ -27,15 +27,12 @@ import java.util.Date;
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
-
     public static final String TEST_VEHICLE_REG_NUMBER = "TST CAR";
     private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO mockTicketDAO;
-
     private static FareCalculatorService fareCalculatorService;
     private static DataBasePrepareService dataBasePrepareService;
-
     @Mock
     private static InputReaderUtil inputReaderUtil;
 
@@ -63,7 +60,6 @@ public class ParkingDataBaseIT {
 
     }
 
-
     @Test
     public void testParkingACar() throws Exception {
         Connection con = null;
@@ -90,17 +86,17 @@ public class ParkingDataBaseIT {
         Connection con = null;
         try {
             con = dataBaseTestConfig.getConnection();
+            long timeIn = System.currentTimeMillis() - (60 * 60 * 1000);
+            Date inTime = new Date(timeIn);
             Date outTime = new Date();
-            double fare;
             ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-            ParkingService exitSpy = Mockito.spy(new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO));
-            doReturn(outTime).when(exitSpy).makeOutTime();
-            exitSpy.processIncomingVehicle();
-            exitSpy.processExitingVehicle();
+            ParkingService pSSpy = Mockito.spy(new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO));
+            doReturn(inTime).when(pSSpy).makeInTime();
+            doReturn(outTime).when(pSSpy).makeOutTime();
+            pSSpy.processIncomingVehicle();
+            pSSpy.processExitingVehicle();
             assertTrue(mockTicketDAO.updateTicket(mockTicketDAO.getTicket(TEST_VEHICLE_REG_NUMBER)));
-            assertFalse(parkingSpotDAO.updateParking(parkingSpot));
-
-
+            assertTrue(parkingSpotDAO.updateParking(parkingSpot));
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {
