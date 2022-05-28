@@ -170,49 +170,49 @@ public class FareCalculatorServiceTest {
     }
 
 
-    @Test
-    public void calculateFareCarForRecurrentCustomer() throws Exception {
-        Connection con = null;
-        try {
-            con = dataBaseTestConfig.getConnection();
-            ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO);
-            ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);
-            ticket.setParkingSpot(parkingSpot);
-
-            long timeIn1 = System.currentTimeMillis() - (45 * 60 * 1000);
-            Date inTime1 = new Date(timeIn1);
-            ticket.setInTime(inTime1);
-            Date outTime1 = new Date();
-            ticket.setOutTime(outTime1);
-
-            //Entry 1
-
-            when(inputReaderUtil.readSelection()).thenReturn(Integer.valueOf("1"));
-            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(TEST_VEHICLE_REGISTRATION);
-            when(mockTicketDAO.getTicket(TEST_VEHICLE_REGISTRATION)).thenReturn(ticket);
-            when(parkingSpotDAO.getNextAvailableSlot(parkingSpot.getParkingType())).thenReturn(2);
-
-            parkingService.processIncomingVehicle();
-            parkingService.processExitingVehicle();
-
-            //Entry 2
-
-            long timeIn2 = System.currentTimeMillis() - (10 * 60 * 1000);
-            Date inTime2 = new Date(timeIn2);
-            ticket.setInTime(inTime2);
-            Date outTime2 = new Date();
-            ticket.setOutTime(outTime2);
-
-            parkingService.processIncomingVehicle();
-            parkingService.processExitingVehicle();
-
-            assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR) - ((0.75 * Fare.CAR_RATE_PER_HOUR) * 0.05), ticket.getPrice());
-
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } finally {
-            dataBaseTestConfig.closeConnection(con);
-        }
-    }
+//    @Test
+//    public void calculateFareCarForRecurrentCustomer() throws Exception {
+//        Connection con = null;
+//        try {
+//            con = dataBaseTestConfig.getConnection();
+//            ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO);
+//            ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);
+//            ticket.setParkingSpot(parkingSpot);
+//
+//            long timeIn1 = System.currentTimeMillis() - (45 * 60 * 1000);
+//            Date inTime1 = new Date(timeIn1);
+//            ticket.setInTime(inTime1);
+//            Date outTime1 = new Date();
+//            ticket.setOutTime(outTime1);
+//
+//            //Entry 1
+//
+//            when(inputReaderUtil.readSelection()).thenReturn(Integer.valueOf("1"));
+//            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(TEST_VEHICLE_REGISTRATION);
+//            when(mockTicketDAO.getTicket(TEST_VEHICLE_REGISTRATION)).thenReturn(ticket);
+//            when(parkingSpotDAO.getNextAvailableSlot(parkingSpot.getParkingType())).thenReturn(2);
+//
+//            parkingService.processIncomingVehicle();
+//            parkingService.processExitingVehicle();
+//
+//            //Entry 2
+//
+//            long timeIn2 = System.currentTimeMillis() - (10 * 60 * 1000);
+//            Date inTime2 = new Date(timeIn2);
+//            ticket.setInTime(inTime2);
+//            Date outTime2 = new Date();
+//            ticket.setOutTime(outTime2);
+//
+//            parkingService.processIncomingVehicle();
+//            parkingService.processExitingVehicle();
+//
+//            assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR) - ((0.75 * Fare.CAR_RATE_PER_HOUR) * 0.05), ticket.getPrice());
+//
+//        } catch (NullPointerException e) {
+//            e.printStackTrace();
+//        } finally {
+//            dataBaseTestConfig.closeConnection(con);
+//        }
+//    }
 }
 

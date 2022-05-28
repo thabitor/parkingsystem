@@ -1,9 +1,10 @@
 package com.parkit.parkingsystem.service;
-
+import java.time.Duration;
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
 
+import java.util.Date;
 import java.util.Objects;
 
 import static java.lang.Math.abs;
@@ -16,51 +17,55 @@ public class FareCalculatorService {
             throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
         }
 
-        double inHour;
-        inHour = ticket.getInTime().getHours();
-        double outHour;
-        outHour = ticket.getOutTime().getHours();
-        double inMinute = ticket.getInTime().getMinutes();
-        double outMinute = ticket.getOutTime().getMinutes();
-        int dateIn = ticket.getInTime().getDate();
-        int dateOut = ticket.getOutTime().getDate();
         int monthIn = ticket.getInTime().getMonth();
+        int dateIn = ticket.getInTime().getDate();
+        double inHour = ticket.getInTime().getHours();
+        double inMinute = ticket.getInTime().getMinutes();
+
         int monthOut = ticket.getOutTime().getMonth();
-        double hrDiff = outHour - inHour;
-        double minDiff = abs(abs(outMinute-60) - abs(inMinute-60));
+        int dateOut = ticket.getOutTime().getDate();
+        double outHour = ticket.getOutTime().getHours();
+        double outMinute = ticket.getOutTime().getMinutes();
+
+        double timeIn = ticket.getInTime().getTime();
+        double timeOut = ticket.getOutTime().getTime();
+        double timeDiff = timeOut - timeIn;
+        double timeDiffMinutes = (timeDiff/(60 * 1000)) % 60;
+        double timeDiffHrs = (timeDiff/(60 * 60 * 1000)) % 24;
+
+
+       // Duration duration = Duration.between(ticket.getInTime().toInstant(), ticket.getOutTime().toInstant());
 
 
         //TODO: Some tests are failing here. Need to check if this logic is correct
 
         double duration;
 
-        if ((dateOut - dateIn == 1) || (dateIn - dateOut > 1 && (monthOut - monthIn == 1 || monthOut - monthIn == -11))) {
+        if ((dateOut - dateIn == 1) || (dateIn - dateOut > 1
+                && (monthOut - monthIn == 1 || monthOut - monthIn == -11))) {
             duration = 24.0;
-        } else if (((abs(hrDiff) <= 1.0 || abs(hrDiff) == 23.0) && outMinute == inMinute)) {
-            duration = 1;
-        } else if (inHour == outHour && minDiff >= 45.0) {
+        } else if (timeDiffHrs >= 1.0 && timeDiffMinutes <= 5.0) {
+            duration = 1.0;
+        } else if (timeDiffMinutes <= 45.0 && timeDiffMinutes > 30.0) {
             duration = 0.75;
-        } else if ((abs(hrDiff) <= 1.0 || abs(hrDiff) == 23.0)
-                && (minDiff <= 15.0 || minDiff >= 45.0)){
-            duration = 0.75;
-        } else if ((inHour == outHour && minDiff <= 30.0)) {
-            duration = 0.0;
-        } else if ((abs(hrDiff) <= 1.0 || abs(hrDiff) == 23.0)
-                && (minDiff <= 30.0) || abs(minDiff - 60) <= 30.0) {
+        } else if (timeDiffMinutes <= 30.0) {
             duration = 0.0;
         } else {
-            duration = hrDiff;
+            duration = outHour - inHour;
         }
-        duration = abs(duration);
+
+        double finalFare;
 
 
         switch (ticket.getParkingSpot().getParkingType()) {
             case CAR: {
                 ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
+                finalFare = ticket.getPrice();
                 break;
             }
             case BIKE: {
                 ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
+                finalFare = ticket.getPrice();
                 break;
             }
             default:
