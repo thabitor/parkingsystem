@@ -13,10 +13,13 @@ import org.apache.logging.log4j.Logger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class ParkingService {
 
+    private double fare;
+    private double discFare;
     private static final Logger logger = LogManager.getLogger("ParkingService");
 
     private FareCalculatorService fareCalculatorService = new FareCalculatorService();
@@ -75,7 +78,13 @@ public class ParkingService {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
+// TODO: JAVADOC this
 
+    /**
+     *
+     * @param vehicleRegNumber
+     * @return
+     */
     public boolean checkVehicleHistory(String vehicleRegNumber) {
         Connection con = null;
         recurrent = false;
@@ -90,7 +99,7 @@ public class ParkingService {
                 this.recurrent = true;
                 PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
                 ps2.setBoolean(1, true);
-                ps2.setInt(2,ticketDAO.getTicket(vehicleRegNumber).getId());
+                ps2.setTimestamp(2, new Timestamp(ticketDAO.getTicket(vehicleRegNumber).getInTime().getTime()));
                 ps2.execute();
             }
         } catch (Exception ex) {
@@ -139,43 +148,41 @@ public class ParkingService {
     }
 
     public void processExitingVehicle() {
-        try{
+        Ticket ticket;
+        Date outTime;
+        try {
             String vehicleRegNumber = getVehichleRegNumber();
-            Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-            Date outTime = makeOutTime();
+            ticket = ticketDAO.getTicket(vehicleRegNumber);
+            outTime = makeOutTime();
             ticket.setOutTime(outTime);
-            fareCalculatorService.calculateFare(ticket);
+            FareCalculatorService.calculateFare(ticket);
             double fare = ticket.getPrice();
             if (recurrent) {
                 ticket.setPrice(fare - (fare * 0.05));
-                double discFare = ticket.getPrice();
-
-                if(ticketDAO.updateTicket(ticket)) {
-                    ParkingSpot parkingSpot = ticket.getParkingSpot();
-                    parkingSpot.setAvailable(true);
-                    parkingSpotDAO.updateParking(parkingSpot);
-
-                    System.out.println("Please pay the parking fare: " + discFare);
-                    System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
-
-                }else{
-                    System.out.println("Unable to update ticket information. Error occurred");
-                }
+                fare = ticket.getPrice();
             }
+            checkIfParkingHasBeenUpdated(ticket, outTime, fare);
+        } catch(Exception e) {
+                logger.error("Unable to process exiting vehicle", e);
+            }
+        }
 
-                if(!recurrent && ticketDAO.updateTicket(ticket)) {
+    private void checkIfParkingHasBeenUpdated(Ticket ticket, Date outTime, double fare) {
+        try {
+            if (ticketDAO.updateTicket(ticket)) {   //TODO: turn this into a separate method
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
-
-                System.out.println("Please pay the parking fare:" + fare);
-                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+                    System.out.println("Please pay the parking fare:" + discFare);
+                    System.out.println("Please pay the parking fare:" + fare);
+                    System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             } else {
                 System.out.println("Unable to update ticket information. Error occurred");
             }
-        } catch (Exception e){
-            logger.error("Unable to process exiting vehicle",e);
+        } catch (Exception e) {
+            logger.error("Unable to process exiting vehicle", e);
         }
     }
-
 }
+
+

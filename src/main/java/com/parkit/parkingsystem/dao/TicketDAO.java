@@ -73,30 +73,6 @@ public class TicketDAO {
         return ticket;
     }
 
-//    public boolean checkVehicleHistory(String vehicleRegNumber) {
-//        Connection con = null;
-//        recurrent = false;
-//        // vehicleRegNumber = "";
-//        getTicket(vehicleRegNumber);
-//        try {
-//            con = dataBaseConfig.getConnection();
-//            PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_HISTORY);
-//            ps.setString(1, vehicleRegNumber);
-//            ResultSet rs = ps.executeQuery();
-//            if (rs.next()) {
-//                recurrent = true;
-////                PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
-////                ps2.setBoolean(1, true);
-////                ps2.setInt(2,getTicket(vehicleRegNumber).getId());
-////                ps2.execute();
-//            }
-//        } catch (Exception ex) {
-//            logger.error("Error checking vehicle history", ex);
-//        } finally {
-//            dataBaseConfig.closeConnection(con);
-//        } return recurrent;
-//    }
-
 
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;
@@ -105,7 +81,7 @@ public class TicketDAO {
             PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
             ps.setDouble(1, ticket.getPrice());
             ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
-            ps.setInt(3,ticket.getId());
+            ps.setTimestamp(3, new Timestamp(ticket.getInTime().getTime()));
             ps.execute();
             return true;
         }catch (Exception ex){

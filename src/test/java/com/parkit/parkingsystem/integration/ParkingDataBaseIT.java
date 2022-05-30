@@ -111,11 +111,14 @@ public class ParkingDataBaseIT {
            con = dataBaseTestConfig.getConnection();
            when(inputReaderUtil.readSelection()).thenReturn(Integer.valueOf("1"));
            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-           ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO);
-           parkingService.processIncomingVehicle();
-           parkingService.processExitingVehicle();
-           parkingService.processIncomingVehicle();
-           assertTrue(parkingService.recurrent);
+           long timeIn = System.currentTimeMillis() - (60 * 60 * 1000);
+           Date inTime = new Date(timeIn);
+           ParkingService pSSpy = Mockito.spy(new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO));
+           doReturn(inTime).when(pSSpy).makeInTime();
+           pSSpy.processIncomingVehicle();
+           pSSpy.processExitingVehicle();
+           pSSpy.processIncomingVehicle();
+           assertTrue(pSSpy.recurrent);
     } catch (NullPointerException e) {
         e.printStackTrace();
     } finally {

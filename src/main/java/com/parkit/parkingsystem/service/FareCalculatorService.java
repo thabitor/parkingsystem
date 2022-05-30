@@ -20,21 +20,18 @@ public class FareCalculatorService {
         int monthIn = ticket.getInTime().getMonth();
         int dateIn = ticket.getInTime().getDate();
         double inHour = ticket.getInTime().getHours();
-        double inMinute = ticket.getInTime().getMinutes();
+       // double inMinute = ticket.getInTime().getMinutes();
 
         int monthOut = ticket.getOutTime().getMonth();
         int dateOut = ticket.getOutTime().getDate();
         double outHour = ticket.getOutTime().getHours();
-        double outMinute = ticket.getOutTime().getMinutes();
+       // double outMinute = ticket.getOutTime().getMinutes();
 
         double timeIn = ticket.getInTime().getTime();
         double timeOut = ticket.getOutTime().getTime();
         double timeDiff = timeOut - timeIn;
         double timeDiffMinutes = (timeDiff/(60 * 1000)) % 60;
         double timeDiffHrs = (timeDiff/(60 * 60 * 1000)) % 24;
-
-
-       // Duration duration = Duration.between(ticket.getInTime().toInstant(), ticket.getOutTime().toInstant());
 
 
         //TODO: Some tests are failing here. Need to check if this logic is correct
@@ -54,18 +51,15 @@ public class FareCalculatorService {
             duration = outHour - inHour;
         }
 
-        double finalFare;
 
 
         switch (ticket.getParkingSpot().getParkingType()) {
             case CAR: {
                 ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
-                finalFare = ticket.getPrice();
                 break;
             }
             case BIKE: {
                 ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
-                finalFare = ticket.getPrice();
                 break;
             }
             default:
