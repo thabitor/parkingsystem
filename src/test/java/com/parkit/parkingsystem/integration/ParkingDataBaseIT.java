@@ -60,6 +60,10 @@ public class ParkingDataBaseIT {
 
     }
 
+    /**
+     * checks that a ticket is actually saved in DB and Parking table is updated with availability
+     * @throws Exception
+     */
     @Test
     public void testParkingACar() throws Exception {
         Connection con = null;
@@ -77,12 +81,12 @@ public class ParkingDataBaseIT {
         }
     }
 
-    //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
-    //TODO: check that a ticket is actually saved in DB and Parking table is updated with availability
 
+    /**
+     * checks that the fare generated and out time are populated correctly in the database
+     */
     @Test
     public void testParkingLotExit() throws Exception {
-        //TODO: check that the fare generated and out time are populated correctly in the database
         Connection con = null;
         try {
             con = dataBaseTestConfig.getConnection();
@@ -104,6 +108,10 @@ public class ParkingDataBaseIT {
         }
     }
 
+    /**
+     * Method tests ParkingService class for checking recurrent customers and returning correct boolean
+     * @throws Exception
+     */
     @Test
     public void testRecurrentCustomer() throws Exception {
         Connection con = null;

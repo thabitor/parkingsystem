@@ -78,12 +78,11 @@ public class ParkingService {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
-// TODO: JAVADOC this
 
     /**
-     *
-     * @param vehicleRegNumber
-     * @return
+     * This method checks if given vehicle registration number exists previously in the database, if true the customer is recurrent and provided 5% discount.
+     * @param vehicleRegNumber as parameter
+     * @return returns the value of 'recurrent' boolean true if registration number exists in the database and false if not
      */
     public boolean checkVehicleHistory(String vehicleRegNumber) {
         Connection con = null;
@@ -161,19 +160,24 @@ public class ParkingService {
                 ticket.setPrice(fare - (fare * 0.05));
                 fare = ticket.getPrice();
             }
-            checkIfParkingHasBeenUpdated(ticket, outTime, fare);
+            checkIfTicketHasBeenUpdated(ticket, outTime, fare);
         } catch(Exception e) {
                 logger.error("Unable to process exiting vehicle", e);
             }
         }
 
-    private void checkIfParkingHasBeenUpdated(Ticket ticket, Date outTime, double fare) {
+    /**
+     * Checks if parking ticket has been updated, it updates parkingspot if true then it tells user fare to pay
+     * @param ticket
+     * @param outTime
+     * @param fare based on condition of recurrent customer in processExitingVehicle method
+     */
+    private void checkIfTicketHasBeenUpdated(Ticket ticket, Date outTime, double fare) {
         try {
-            if (ticketDAO.updateTicket(ticket)) {   //TODO: turn this into a separate method
+            if (ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
-                    System.out.println("Please pay the parking fare:" + discFare);
                     System.out.println("Please pay the parking fare:" + fare);
                     System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             } else {
