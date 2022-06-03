@@ -17,7 +17,7 @@ public class DataBaseConfig {
         PropertiesReader connectionCredentials = new PropertiesReader("dbConnectionConfig.properties");
         return DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/prod",
-                "thabit",
+                "root",
                 "rootroot");
     }
 

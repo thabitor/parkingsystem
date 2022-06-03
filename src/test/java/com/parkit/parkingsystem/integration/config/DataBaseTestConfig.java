@@ -18,7 +18,7 @@ public class DataBaseTestConfig extends DataBaseConfig {
 
         return DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/test",
-                "thabit",
+                "root",
                 "rootroot");
     }
 
