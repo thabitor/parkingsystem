@@ -167,7 +167,7 @@ public class ParkingService {
         }
 
     /**
-     * Checks if parking ticket has been updated, it updates parkingspot if true then it tells user fare to pay
+     * Checks if parking ticket has been updated, then updates parkingspot if true and tells user fare to pay
      * @param ticket
      * @param outTime
      * @param fare based on condition of recurrent customer in processExitingVehicle method
