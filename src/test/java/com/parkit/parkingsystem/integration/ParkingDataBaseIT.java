@@ -84,6 +84,8 @@ public class ParkingDataBaseIT {
 
     /**
      * checks that the fare generated and out time are populated correctly in the database
+     * pSSpy is a parking service instance used to spy on the in and out time methods in the
+     * parking service class in order to mock their outcome for this test
      */
     @Test
     public void testParkingLotExit() throws Exception {
@@ -110,6 +112,8 @@ public class ParkingDataBaseIT {
 
     /**
      * Method tests ParkingService class for checking recurrent customers and returning correct boolean
+     * pSSpy is a parking service instance used to spy on the in time method in
+     * the parking service class in order to mock its outcome for this test
      * @throws Exception
      */
     @Test
