@@ -37,7 +37,7 @@ public class ParkingDataBaseIT {
     private static InputReaderUtil inputReaderUtil;
 
     @BeforeAll
-    private static void setUp() throws Exception {
+    private static void setUp() {
         parkingSpotDAO = new ParkingSpotDAO();
         parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
         mockTicketDAO = new TicketDAO();
@@ -73,7 +73,6 @@ public class ParkingDataBaseIT {
             parkingService.processIncomingVehicle();
             Ticket ticket = mockTicketDAO.getTicket(TEST_VEHICLE_REG_NUMBER);
             assertFalse(ticket.getParkingSpot().isAvailable());
-
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {

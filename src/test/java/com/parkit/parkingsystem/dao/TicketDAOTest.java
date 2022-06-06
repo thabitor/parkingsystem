@@ -70,7 +70,6 @@ class TicketDAOTest {
         Connection con = null;
         try {
             con = dataBaseTestConfig.getConnection();
-
             Ticket ticket = new Ticket();
             long timeIn = System.currentTimeMillis() - (60 * 60 * 1000);
             Date inTime = new Date(timeIn);

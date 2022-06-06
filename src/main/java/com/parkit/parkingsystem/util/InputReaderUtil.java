@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class InputReaderUtil {
 
-    private static Scanner scan = new Scanner(System.in);
+    private static Scanner scan = new Scanner(System.in, "UTF-8");
     private static final Logger logger = LogManager.getLogger("InputReaderUtil");
 
     public int readSelection() {
@@ -21,7 +21,7 @@ public class InputReaderUtil {
         }
     }
 
-    public String readVehicleRegistrationNumber() throws Exception {
+    public String readVehicleRegistrationNumber() {
         try {
             String vehicleRegNumber= scan.nextLine();
             if(vehicleRegNumber == null || vehicleRegNumber.trim().length()==0) {

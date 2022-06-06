@@ -15,13 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.text.SimpleDateFormat;
-
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
 import java.util.Date;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,7 +70,7 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    public void calculateFareBike() throws Exception {
+    public void calculateFareBike() {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         Date outTime = new Date();
@@ -114,7 +110,7 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    public void calculateFareBikeWithLessThanOneHourParkingTime() throws Exception {
+    public void calculateFareBikeWithLessThanOneHourParkingTime() {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000));//45 minutes parking time should give 3/4th parking fare
         Date outTime = new Date();
@@ -128,7 +124,7 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    public void calculateFareCarWithLessThanOneHourParkingTime() throws Exception {
+    public void calculateFareCarWithLessThanOneHourParkingTime() {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000));//45 minutes parking time should give 3/4th parking fare
         Date outTime = new Date();
@@ -142,7 +138,7 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    public void calculateFareCarWithMoreThanADayParkingTime() throws Exception {
+    public void calculateFareCarWithMoreThanADayParkingTime() {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (24 * 60 * 60 * 1000));//24 hours parking time should give 24 * parking fare per hour
         Date outTime = new Date();
@@ -156,7 +152,7 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    public void calculateFareCarWithLessThanHalfHour() {
+    public void calculateFareCarWithLessThanHalfHourParkingTime() {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));//30 minutes parking time should give 0 * parking fare per hour
         Date outTime = new Date();
@@ -169,50 +165,4 @@ public class FareCalculatorServiceTest {
         assertEquals(ticket.getPrice(), (0 * Fare.CAR_RATE_PER_HOUR));
     }
 
-
-//    @Test
-//    public void calculateFareCarForRecurrentCustomer() throws Exception {
-//        Connection con = null;
-//        try {
-//            con = dataBaseTestConfig.getConnection();
-//            ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO);
-//            ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);
-//            ticket.setParkingSpot(parkingSpot);
-//
-//            long timeIn1 = System.currentTimeMillis() - (45 * 60 * 1000);
-//            Date inTime1 = new Date(timeIn1);
-//            ticket.setInTime(inTime1);
-//            Date outTime1 = new Date();
-//            ticket.setOutTime(outTime1);
-//
-//            //Entry 1
-//
-//            when(inputReaderUtil.readSelection()).thenReturn(Integer.valueOf("1"));
-//            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(TEST_VEHICLE_REGISTRATION);
-//            when(mockTicketDAO.getTicket(TEST_VEHICLE_REGISTRATION)).thenReturn(ticket);
-//            when(parkingSpotDAO.getNextAvailableSlot(parkingSpot.getParkingType())).thenReturn(2);
-//
-//            parkingService.processIncomingVehicle();
-//            parkingService.processExitingVehicle();
-//
-//            //Entry 2
-//
-//            long timeIn2 = System.currentTimeMillis() - (10 * 60 * 1000);
-//            Date inTime2 = new Date(timeIn2);
-//            ticket.setInTime(inTime2);
-//            Date outTime2 = new Date();
-//            ticket.setOutTime(outTime2);
-//
-//            parkingService.processIncomingVehicle();
-//            parkingService.processExitingVehicle();
-//
-//            assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR) - ((0.75 * Fare.CAR_RATE_PER_HOUR) * 0.05), ticket.getPrice());
-//
-//        } catch (NullPointerException e) {
-//            e.printStackTrace();
-//        } finally {
-//            dataBaseTestConfig.closeConnection(con);
-//        }
-//    }
 }
-

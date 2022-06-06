@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import static org.mockito.Mockito.*;
@@ -29,7 +28,7 @@ public class ParkingServiceTest {
     @Mock
     private static ParkingSpotDAO parkingSpotDAO;
     @Mock
-    private static TicketDAO ticketDAO;
+    private static TicketDAO mockTicketDAO;
 
     @BeforeEach
     private void setUpPerTest() {
@@ -40,10 +39,10 @@ public class ParkingServiceTest {
             ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000)));
             ticket.setParkingSpot(parkingSpot);
             ticket.setVehicleRegNumber("ABCDEF");
-            when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
-            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+            when(mockTicketDAO.getTicket(anyString())).thenReturn(ticket);
+            when(mockTicketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
             when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, mockTicketDAO);
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("Failed to set up test mock objects");
@@ -51,7 +50,7 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void processExitingVehicleTest(){
+    public void processExitingVehicleTest() {
         parkingService.processExitingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }

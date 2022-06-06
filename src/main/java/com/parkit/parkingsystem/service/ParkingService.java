@@ -24,7 +24,7 @@ public class ParkingService {
     private TicketDAO ticketDAO;
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
-    public static boolean recurrent;
+    public boolean recurrent;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
@@ -92,7 +92,7 @@ public class ParkingService {
             ps.setString(1, vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                this.recurrent = true;
+                recurrent = true;
                 PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
                 ps2.setBoolean(1, true);
                 ps2.setTimestamp(2, new Timestamp(ticketDAO.getTicket(vehicleRegNumber).getInTime().getTime()));
