@@ -18,15 +18,13 @@ import java.util.Date;
 
 public class ParkingService {
 
-    private double fare;
-    private double discFare;
     private static final Logger logger = LogManager.getLogger("ParkingService");
 
     private FareCalculatorService fareCalculatorService = new FareCalculatorService();
     private TicketDAO ticketDAO;
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
-    public boolean recurrent;
+    public static boolean recurrent;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
@@ -84,10 +82,9 @@ public class ParkingService {
      * @param vehicleRegNumber as parameter
      * @return returns the value of 'recurrent' boolean true if registration number exists in the database and false if not
      */
-    public boolean checkVehicleHistory(String vehicleRegNumber) {
+    public boolean checkVehicleHistory (String vehicleRegNumber) {
         Connection con = null;
         recurrent = false;
-        // vehicleRegNumber = "";
         ticketDAO.getTicket(vehicleRegNumber);
         try {
             con = ticketDAO.dataBaseConfig.getConnection();
@@ -114,14 +111,14 @@ public class ParkingService {
         try{
             ParkingType parkingType = getVehichleType();
             parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);
-            if(parkingNumber > 0){
+            if(parkingNumber > 0) {
                 parkingSpot = new ParkingSpot(parkingNumber,parkingType, true);
-            }else{
+            } else {
                 throw new Exception("Error fetching parking number from DB. Parking slots might be full");
             }
-        }catch(IllegalArgumentException ie){
+        } catch(IllegalArgumentException ie) {
             logger.error("Error parsing user input for type of vehicle", ie);
-        }catch(Exception e){
+        } catch(Exception e) {
             logger.error("Error fetching next available parking slot", e);
         }
         return parkingSpot;
@@ -167,10 +164,10 @@ public class ParkingService {
         }
 
     /**
-     * Checks if parking ticket has been updated, then updates parkingspot if true and tells user fare to pay
+     * Checks if parking ticket has been updated, then updates parking spot if true and tells user fare to pay
      * @param ticket
      * @param outTime
-     * @param fare based on condition of recurrent customer in processExitingVehicle method
+     * @param fare based on condition of recurrent customer in ProcessExitingVehicle() method
      */
     private void checkIfTicketHasBeenUpdated(Ticket ticket, Date outTime, double fare) {
         try {

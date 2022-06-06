@@ -42,7 +42,7 @@ class TicketDAOTest {
     private static InputReaderUtil inputReaderUtil;
 
     @BeforeAll
-    private static void setUp() throws Exception {
+    private static void setUp() {
         parkingSpotDAO = new ParkingSpotDAO();
         parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
         mockTicketDAO = new TicketDAO();
@@ -52,7 +52,7 @@ class TicketDAOTest {
     }
 
     @BeforeEach
-    private void setUpPerTest() throws Exception {
+    private void setUpPerTest() {
         dataBasePrepareService.clearDataBaseEntries();
     }
 
@@ -66,20 +66,30 @@ class TicketDAOTest {
      */
     @Test
     void testSaveTicket() {
-        TicketDAO mockTicketDAO = new TicketDAO();
 
-        Ticket ticket = new Ticket();
-        long timeIn = System.currentTimeMillis() - (60 * 60 * 1000);
-        Date inTime = new Date(timeIn);
-        Date outTime = new Date();
-        ticket.setId(1);
-        ticket.setInTime(inTime);
-        ticket.setOutTime(outTime);
-        ticket.setParkingSpot(new ParkingSpot(10, ParkingType.CAR, true));
-        ticket.setPrice(1.5);
-        ticket.setVehicleRegNumber(TEST_CAR_REG_NUMBER);
-        assertFalse(mockTicketDAO.saveTicket(ticket));
+        Connection con = null;
+        try {
+            con = dataBaseTestConfig.getConnection();
+
+            Ticket ticket = new Ticket();
+            long timeIn = System.currentTimeMillis() - (60 * 60 * 1000);
+            Date inTime = new Date(timeIn);
+            Date outTime = new Date();
+            ticket.setId(1);
+            ticket.setInTime(inTime);
+            ticket.setOutTime(outTime);
+            ticket.setParkingSpot(new ParkingSpot(1, ParkingType.CAR, true));
+            ticket.setPrice(1.5);
+            ticket.setVehicleRegNumber(TEST_CAR_REG_NUMBER);
+            assertFalse(mockTicketDAO.saveTicket(ticket));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            dataBaseTestConfig.closeConnection(con);
+        }
     }
+
+
     /**
      * Method under test: {@link TicketDAO#getTicket(String)}
      */
@@ -117,7 +127,10 @@ class TicketDAOTest {
      * Method under test: {@link TicketDAO#updateTicket(Ticket)}
      */
     @Test
-    void testUpdateTicket() throws SQLException, ClassNotFoundException {
+    void testUpdateTicket() {
+        Connection con = null;
+        try {
+            con = dataBaseTestConfig.getConnection();
         Ticket ticket = new Ticket();
         long timeIn = System.currentTimeMillis() - (60 * 60 * 1000);
         Date inTime = new Date(timeIn);
@@ -129,6 +142,11 @@ class TicketDAOTest {
         ticket.setPrice(1.5);
         ticket.setVehicleRegNumber(TEST_CAR_REG_NUMBER);
         assertTrue(mockTicketDAO.updateTicket(ticket));
+    } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            dataBaseTestConfig.closeConnection(con);
+        }
     }
 }
 

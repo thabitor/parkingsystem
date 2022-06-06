@@ -33,7 +33,7 @@ public class TicketDAO {
             ps.setDouble(4, ticket.getPrice());
             ps.setTimestamp(5, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(6, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
-         //   ps.setBoolean(6, checkVehicleHistory(ticket.getVehicleRegNumber()));
+            ps.setBoolean(7, ParkingService.recurrent);
             return ps.execute();
         } catch (Exception ex) {
             logger.error("Error fetching next available slot", ex);
