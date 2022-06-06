@@ -83,8 +83,12 @@ public class FareCalculatorServiceTest {
         assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR);
     }
 
+    /**
+     * Method tests if parking type is null and throws exception
+     * @Throws NullPointerException
+     */
     @Test
-    public void calculateFareUnkownType() {
+    public void calculateFareUnknownType() {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         Date outTime = new Date();
@@ -154,7 +158,7 @@ public class FareCalculatorServiceTest {
     @Test
     public void calculateFareCarWithLessThanHalfHourParkingTime() {
         Date inTime = new Date();
-        inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));//30 minutes parking time should give 0 * parking fare per hour
+        inTime.setTime(System.currentTimeMillis() - (25 * 60 * 1000));//30 minutes parking time or less should give 0 * parking fare per hour
         Date outTime = new Date();
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
@@ -163,6 +167,38 @@ public class FareCalculatorServiceTest {
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
         assertEquals(ticket.getPrice(), (0 * Fare.CAR_RATE_PER_HOUR));
+    }
+
+    @Test
+    public void calculateFareCarWithSeveralHoursParkingTime() {
+        Date inTime = new Date();
+        inTime.setTime(System.currentTimeMillis() - (120 * 60 * 1000));//30 minutes parking time should give 2 * parking fare per hour
+        Date outTime = new Date();
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        fareCalculatorService.calculateFare(ticket);
+        assertEquals(ticket.getPrice(), (2 * Fare.CAR_RATE_PER_HOUR));
+    }
+
+    /**
+     * Method tests if parking type is unknown and throws exception
+    * @Throws IllegalArgumentException
+     */
+
+    @Test
+    public void calculateFareWithUnknownParkingTypeShouldThrowIllegalArgumentException() {
+        Date inTime = new Date();
+        inTime.setTime(System.currentTimeMillis() - (120 * 60 * 1000)); //any number of hours
+        Date outTime = new Date();
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.UNKNOWN, false); //parking type unknown should throw illegal argument exception
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        assertThrows(IllegalArgumentException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
 
 }

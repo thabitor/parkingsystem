@@ -10,6 +10,8 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -152,12 +154,15 @@ public class ParkingService {
             outTime = makeOutTime();
             ticket.setOutTime(outTime);
             FareCalculatorService.calculateFare(ticket);
-            double fare = ticket.getPrice();
+            double getFare = ticket.getPrice();
+            BigDecimal fareGetDecimal = new BigDecimal(getFare);
+            fareGetDecimal = fareGetDecimal.setScale(2, BigDecimal.ROUND_DOWN);
             if (recurrent) {
-                ticket.setPrice(fare - (fare * 0.05));
-                fare = ticket.getPrice();
+                ticket.setPrice(getFare - (getFare * 0.05));
+                BigDecimal fareGetDecimalDiscounted = new BigDecimal(getFare);
+                fareGetDecimal = fareGetDecimalDiscounted.setScale(2, BigDecimal.ROUND_DOWN);
             }
-            checkIfTicketHasBeenUpdated(ticket, outTime, fare);
+            checkIfTicketHasBeenUpdated(ticket, outTime, fareGetDecimal);
         } catch(Exception e) {
                 logger.error("Unable to process exiting vehicle", e);
             }
@@ -167,15 +172,15 @@ public class ParkingService {
      * Checks if parking ticket has been updated, then updates parking spot if true and tells user fare to pay
      * @param ticket
      * @param outTime
-     * @param fare based on condition of recurrent customer in ProcessExitingVehicle() method
+     * @param fareGetDecimal based on condition of recurrent customer in ProcessExitingVehicle() method
      */
-    private void checkIfTicketHasBeenUpdated(Ticket ticket, Date outTime, double fare) {
+    private void checkIfTicketHasBeenUpdated(Ticket ticket, Date outTime, BigDecimal fareGetDecimal) {
         try {
             if (ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
-                    System.out.println("Please pay the parking fare:" + fare);
+                    System.out.println("Please pay the parking fare:" + fareGetDecimal);
                     System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             } else {
                 System.out.println("Unable to update ticket information. Error occurred");

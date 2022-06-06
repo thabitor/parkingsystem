@@ -17,9 +17,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static java.lang.Math.round;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.util.Date;
 
@@ -72,13 +75,14 @@ public class ParkingServiceIT {
             inTimeSpy.processExitingVehicle();
             inTimeSpy.processIncomingVehicle();
             inTimeSpy.processExitingVehicle();
-            assertEquals((Fare.CAR_RATE_PER_HOUR) - ((Fare.CAR_RATE_PER_HOUR) * 0.05), mockTicketDAO.getTicket(TEST_CAR_REG_NUMBER).getPrice());
+            assertEquals(round((Fare.CAR_RATE_PER_HOUR) - ((Fare.CAR_RATE_PER_HOUR) * 0.05)), round(mockTicketDAO.getTicket(TEST_CAR_REG_NUMBER).getPrice()));
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {
             dataBaseTestConfig.closeConnection(con);
         }
     }
+
 
     @Test
     public void calculateFareBikeForRecurrentUser() throws Exception {
@@ -95,7 +99,7 @@ public class ParkingServiceIT {
             inTimeSpy.processExitingVehicle();
             inTimeSpy.processIncomingVehicle();
             inTimeSpy.processExitingVehicle();
-            assertEquals((Fare.BIKE_RATE_PER_HOUR) - ((Fare.BIKE_RATE_PER_HOUR) * 0.05), mockTicketDAO.getTicket(TEST_BIKE_REG_NUMBER).getPrice());
+            assertEquals(round((Fare.CAR_RATE_PER_HOUR) - ((Fare.CAR_RATE_PER_HOUR) * 0.05)), round(mockTicketDAO.getTicket(TEST_CAR_REG_NUMBER).getPrice()));
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {
