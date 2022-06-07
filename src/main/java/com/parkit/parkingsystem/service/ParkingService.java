@@ -27,6 +27,8 @@ public class ParkingService {
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
     public boolean recurrent;
+    public Date inTime;
+    public Date outTime;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
@@ -43,7 +45,7 @@ public class ParkingService {
                 String vehicleRegNumber = getVehichleRegNumber();
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark its availability as false
-                Date inTime = makeInTime();
+                this.inTime = makeInTime();
                 Ticket ticket = new Ticket();
                 //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
                 //ticket.setId(ticketID);
@@ -98,7 +100,7 @@ public class ParkingService {
                 recurrent = true;
                 PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
                 ps2.setBoolean(1, true);
-                ps2.setTimestamp(2, new Timestamp(ticketDAO.getTicket(vehicleRegNumber).getInTime().getTime()));
+                ps2.setTimestamp(2, new Timestamp(inTime.getTime()));
                 ps2.execute();
             }
         } catch (Exception ex) {
@@ -148,7 +150,6 @@ public class ParkingService {
 
     public void processExitingVehicle() {
         Ticket ticket;
-        Date outTime;
         try {
             String vehicleRegNumber = getVehichleRegNumber();
             ticket = ticketDAO.getTicket(vehicleRegNumber);

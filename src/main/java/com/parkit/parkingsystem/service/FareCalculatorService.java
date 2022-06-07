@@ -37,7 +37,7 @@ public class FareCalculatorService {
 
         double duration;
 
-        if ((dateOut - dateIn == 1) || (dateIn - dateOut > 1
+        if ((dateOut - dateIn == 1) || (dateIn - dateOut >= 1
                 && (monthOut - monthIn == 1 || monthOut - monthIn == -11))) {
             duration = 24.0;
         } else if ((timeDiffHrs == 1.0 && timeDiffMinutes <= 5.0)) {
