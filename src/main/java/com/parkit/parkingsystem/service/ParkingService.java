@@ -36,6 +36,7 @@ public class ParkingService {
 
 
     public void processIncomingVehicle() {
+        recurrent = false;
         try{
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
             if(parkingSpot !=null && parkingSpot.getId() > 0){

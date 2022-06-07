@@ -99,7 +99,7 @@ public class ParkingServiceIT {
             inTimeSpy.processExitingVehicle();
             inTimeSpy.processIncomingVehicle();
             inTimeSpy.processExitingVehicle();
-            assertEquals(round((Fare.CAR_RATE_PER_HOUR) - ((Fare.CAR_RATE_PER_HOUR) * 0.05)), round(mockTicketDAO.getTicket(TEST_CAR_REG_NUMBER).getPrice()));
+            assertEquals(round((Fare.CAR_RATE_PER_HOUR) - ((Fare.CAR_RATE_PER_HOUR) * 0.05)), round(mockTicketDAO.getTicket(TEST_BIKE_REG_NUMBER).getPrice()));
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {
