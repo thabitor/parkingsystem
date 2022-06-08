@@ -89,7 +89,7 @@ public class ParkingService {
      */
     public boolean checkVehicleHistory (String vehicleRegNumber) {
         Connection con = null;
-        recurrent = false;
+        //recurrent = false;
         ticketDAO.getTicket(vehicleRegNumber);
         try {
             con = ticketDAO.dataBaseConfig.getConnection();
@@ -99,8 +99,8 @@ public class ParkingService {
             if (rs.next()) {
                 recurrent = true;
                 PreparedStatement ps2 = con.prepareStatement(DBConstants.UPDATE_RECURRENT);
-                ps2.setBoolean(1, true);
-                ps2.setTimestamp(2, new Timestamp(inTime.getTime()));
+                ps2.setBoolean(1, recurrent);
+                ps2.setString(2, vehicleRegNumber);
                 ps2.execute();
             }
         } catch (Exception ex) {
